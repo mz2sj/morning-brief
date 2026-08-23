@@ -230,8 +230,9 @@ def main():
                 print("note:", el["elements"][0]["content"])
         return
 
-    if not os.environ.get("FEISHU_WEBHOOK"):
-        print("⚠ 未配置 FEISHU_WEBHOOK（仓库Secret），本次跳过飞书推送；面板数据仍会正常更新")
+    has_app = all(os.environ.get(k) for k in ("FEISHU_APP_ID", "FEISHU_APP_SECRET", "FEISHU_OPEN_ID"))
+    if not has_app and not os.environ.get("FEISHU_WEBHOOK"):
+        print("⚠ 未配置飞书凭证（FEISHU_APP_ID/SECRET/OPEN_ID），本次跳过推送；面板数据仍会正常更新")
         return
 
     feishu.push_card(card)

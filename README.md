@@ -9,17 +9,20 @@
 | `daily_push.py` | 抓数 → 计算当日指标 → 推送飞书卡片 |
 | `build_dashboard.py` | 重建近一年历史序列（`docs/assets/data.js`） |
 | `data_layer.py` | 数据层（纯 requests，无重型依赖） |
-| `feishu.py` | 飞书 Webhook 推送（支持加签） |
+| `feishu.py` | 飞书推送（自建应用 OpenAPI 优先，Webhook 备选） |
 | `docs/` | 静态数据面板（ECharts，data.js 每日由 CI 更新） |
 | `.github/workflows/daily-brief.yml` | 定时任务（工作日 08:30，北京时间） |
 
 ## 部署步骤（一次性，约10分钟）
 
-### 1. 建飞书机器人
+### 1. 飞书自建应用（个人账号可用）
 
-1. 飞书群 → **群设置 → 群机器人 → 添加机器人 → 自定义机器人**
-2. 复制生成的 **Webhook 地址**
-3. （可选）安全设置勾选"签名校验"，复制 **secret**；不勾则无需 secret
+1. 打开 https://open.feishu.cn/app 创建企业自建应用
+2. **凭证与基础信息**：记下 App ID / App Secret
+3. **应用能力 → 机器人**：开通机器人能力（必须，否则无法以应用身份发消息）
+4. **权限管理**：开通 `im:message`、`im:message:send_as_bot`
+5. **版本管理与发布**：创建版本并发布；或把自己加为测试人员
+6. 首次使用时在飞书里打开该应用，完成一次私聊（点「发起会话」）
 
 ### 2. 配置仓库 Secret
 
@@ -27,10 +30,11 @@
 
 | Name | Value |
 |------|-------|
-| `FEISHU_WEBHOOK` | 步骤1的 Webhook 地址 |
-| `FEISHU_SECRET` | （仅当开启了签名校验）签名 secret |
+| `FEISHU_APP_ID` | 应用 App ID |
+| `FEISHU_APP_SECRET` | 应用 App Secret |
+| `FEISHU_OPEN_ID` | 接收人 open_id（形如 `ou_...`） |
 
-> Webhook 存在 Secret 中，仓库代码不包含任何密钥。
+> 凭证只存在 Secret 中，仓库代码不包含任何密钥。企业版自定义机器人 Webhook 仍可作为备选（`FEISHU_WEBHOOK`）。
 
 ### 3. 开启 GitHub Pages（可选，用于网页面板）
 
