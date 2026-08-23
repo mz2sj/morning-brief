@@ -2,7 +2,7 @@ name: daily-brief
 
 on:
   push:
-    # 代码/工作流变更时立即跑一次（CI自身只提交docs/assets/data.js，不会触发，无循环）
+    # 代码或工作流变更时立即跑一次；任务自己提交的静态文件不会再次触发
     branches: [main]
     paths:
       - ".github/workflows/**"
@@ -36,7 +36,7 @@ jobs:
       - name: 安装依赖
         run: pip install -r requirements.txt
 
-      - name: 推送飞书简报
+      - name: 发送提醒
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
@@ -50,14 +50,14 @@ jobs:
           DASHBOARD_DIR: docs
         run: python build_dashboard.py
 
-      - name: 提交面板更新
+      - name: 提交更新
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/assets/data.js
           if git diff --cached --quiet; then
-            echo "面板数据无变化，跳过提交"
+            echo "无变化，跳过提交"
           else
-            git commit -m "chore: update dashboard data $(date -u +%Y-%m-%d)"
+            git commit -m "chore: scheduled update $(date -u +%Y-%m-%d)"
             git push
           fi
