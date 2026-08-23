@@ -1,6 +1,13 @@
 name: daily-brief
 
 on:
+  push:
+    # 代码/工作流变更时立即跑一次（CI自身只提交docs/assets/data.js，不会触发，无循环）
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - "*.py"
+      - "requirements.txt"
   schedule:
     # GitHub Actions 用 UTC：00:30 UTC = 北京时间 08:30，工作日早晨
     # GitHub 官方不保证准点，通常在 1~10 分钟内执行

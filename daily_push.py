@@ -230,6 +230,10 @@ def main():
                 print("note:", el["elements"][0]["content"])
         return
 
+    if not os.environ.get("FEISHU_WEBHOOK"):
+        print("⚠ 未配置 FEISHU_WEBHOOK（仓库Secret），本次跳过飞书推送；面板数据仍会正常更新")
+        return
+
     feishu.push_card(card)
     print("飞书日报已推送")
 
